@@ -42,7 +42,7 @@ f_shader = config/shader/triangle.frag
 - [x] Add OpenGL Backend
 - [ ] Add Audio Support
 - [x] Add Keyboard Support
-- [x] Emulate Chip8 Hardware
+- [x] Emulate Chip8 Virtual Hardware
 - [ ] Add Vulkan Backend
 - [ ] Add wgpu Backend
 - [ ] Add jit recompiler
