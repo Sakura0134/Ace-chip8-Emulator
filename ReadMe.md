@@ -1,7 +1,8 @@
 # ACE(Another Chip8 Emulator)
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/" alt="ace" width="200">
+  <img src="https://raw.githubusercontent.com/Sakura0134/Ace-chip8-Emulator/main/assets/ace2.png" alt="ace" width="400">
+  <img src="https://raw.githubusercontent.com/Sakura0134/Ace-chip8-Emulator/main/assets/ace.png" alt="ace" width="400">
   <br>
   <b>ACE(Another Chip8 Emulator)</b>
   <br>
