@@ -31,8 +31,8 @@ pub struct Mesh {
 impl Mesh {
     ///Creates a new Mesh
     pub fn new(x: u8, y: u8) -> Self {
-        let x = (2.0 * x as GLfloat) - (cfg::WIDTH as GLfloat - 2.0);
-        let y = (cfg::HEIGHT as GLfloat - 2.0) - (2.0 * y as GLfloat);
+        let x = (2.0 * x as GLfloat) - (cfg::WIDTH as GLfloat - 1.0);
+        let y = (cfg::HEIGHT as GLfloat - 1.0) - (2.0 * y as GLfloat);
 
         Mesh {
             vao: 0,
