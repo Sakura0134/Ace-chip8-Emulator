@@ -234,7 +234,6 @@ impl Chip8 {
                 let h = val / 100;
                 let o = val % 10;
                 let t = val / 10 % 10;
-                println!("hto:{} {} {} \n v[x]:{}", h, t, o, self.cpu.v[x as usize]);
                 self.memory.set(self.cpu.i, h);
                 self.memory.set(self.cpu.i + 1, t);
                 self.memory.set(self.cpu.i + 2, o);
