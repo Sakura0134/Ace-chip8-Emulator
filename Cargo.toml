@@ -1,0 +1,21 @@
+[package]
+name = "ace"
+version = "0.3.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+glfw = "0.42.0"
+gl = "0.14.0"
+nalgebra-glm = "0.15.0"
+rand = "0.8.4"
+rust-ini = "0.17"
+
+[lib]
+name = "chip8"
+path = "src/chip8.rs"
+
+[[bin]]
+name = "ace_cli"
+path = "src/frontend/ace_cli.rs"
