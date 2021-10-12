@@ -12,6 +12,6 @@ fn main() {
     let mut env_args = env::args();
     env_args.next();
     let rom: String = env_args.next().unwrap();
-    let config: String = env_args.next().unwrap_or(String::from("config/config.ini"));
+    let config: String = env_args.next().unwrap_or_else(||String::from("config/config.ini"));
     chip8::load(&rom, &config);
 }
