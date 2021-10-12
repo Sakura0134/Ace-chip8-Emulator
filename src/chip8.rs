@@ -70,7 +70,7 @@ impl Chip8 {
         Chip8 {
             display: Display::new(),
             keyboard: Keyboard::new(),
-            memory: Memory::new(&cfg::DEFAULT_CHAR_SET),
+            memory: Memory::new(),
             cpu: Cpu::new(),
         }
     }
