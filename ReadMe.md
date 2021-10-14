@@ -25,6 +25,7 @@ fg = 4 //Sets Foreground Colour
 
 [Hack]
 delay = 100 //Sets delay
+clock = 700 //Sets clock speed(700 is the optimal. Recommended range 500 - 1000)
 
 [Screen]
 scale = 10 //Sets scaling
@@ -52,7 +53,7 @@ f_shader = config/shader/triangle.frag
 - [ ] Add a intermediate GUI library
 
 ## Imperfections in Code
-- [ ] Need to find a better way to handle inputs
-- [ ] Optimize opengl code
-- [ ] Audio slows down the code
+- [x] Need to find a better way to handle inputs
+- [x] Optimize opengl code
+- [x] Find why Audio slows down the code
 - [ ] Find the bad instruction(causing troubles in INVADERS)
