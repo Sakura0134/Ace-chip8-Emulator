@@ -53,7 +53,5 @@ f_shader = config/shader/triangle.frag
 - [ ] Add a intermediate GUI library
 
 ## Imperfections in Code
-- [x] Need to find a better way to handle inputs
-- [x] Optimize opengl code
-- [x] Find why Audio slows down the code
 - [ ] Find the bad instruction(causing troubles in INVADERS)
+- [ ] Hint the bug that causes stack overflow in Invaders
