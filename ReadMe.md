@@ -49,7 +49,7 @@ f_shader = config/shader/triangle.frag
 - [x] Emulate VM
 - [ ] Add Vulkan Backend
 - [ ] Add wgpu Backend
-- [ ] Add jit recompiler
+- [ ] Add dynamic(jit) recompiler
 - [ ] Add a intermediate GUI library
 
 ## Imperfections in Code
