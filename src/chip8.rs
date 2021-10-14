@@ -53,6 +53,7 @@ pub struct Config {
     pub fg: &'static cfg::Color,
     delay: u16,
     audio: bool,
+    cpu: u16,
 }
 
 ///# Chip8 Struct
@@ -336,7 +337,9 @@ fn load_config(config_loc: &str) -> Config {
                 .set("bg", "3")
                 .set("fg", "4");
 
-            ini.with_section(Some("Hack")).set("delay", "100");
+            ini.with_section(Some("Hack"))
+                .set("delay", "100")
+                .set("cpu", "700");
 
             ini.with_section(Some("Screen")).set("scale", "10");
 
@@ -390,7 +393,14 @@ fn load_config(config_loc: &str) -> Config {
         None => "false",
     };
 
-    let audio = audio.trim().parse().unwrap();
+    let audio: bool = audio.trim().parse().unwrap();
+
+    let cpu = match config_ini.section(Some("Audio")) {
+        Some(val) => val.get("cpu").unwrap_or("700"),
+        None => "700",
+    };
+
+    let cpu: u16 = cpu.trim().parse().unwrap();
 
     Config {
         v_shader: v_shader.to_owned(),
@@ -400,6 +410,7 @@ fn load_config(config_loc: &str) -> Config {
         fg,
         delay,
         audio,
+        cpu,
     }
 }
 
@@ -422,6 +433,7 @@ pub fn load(rom_loc: &str, config_loc: &str) {
     let mut mesh_list: Vec<Mesh> = Vec::new();
 
     chip8.load_rom(rom_loc);
+    let mut count: f32 = (main_window.get_ticks() as f32 / 1000_f32) + (1_f32 / config.cpu as f32);
 
     while main_window.process_events(&cfg::KEY_MAP, &mut chip8.keyboard) {
         unsafe {
@@ -470,6 +482,9 @@ pub fn load(rom_loc: &str, config_loc: &str) {
             chip8.cpu.dt -= 1;
             thread::sleep(Duration::from_nanos(config.delay.try_into().unwrap()));
         }
+
+        while count > main_window.get_ticks() as f32 {}
+        count += 1_f32 / config.cpu as f32;
     }
 }
 
