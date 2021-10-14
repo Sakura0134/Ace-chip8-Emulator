@@ -29,15 +29,15 @@ impl Cpu {
             stack: [0; cfg::TOTAL_STACK_SIZE as usize],
         }
     }
+
     ///Pushes into stack
     pub fn push(&mut self, item: u16) {
         assert!(
             self.sp < cfg::TOTAL_STACK_SIZE,
             "[Error] Invalid pointer to stack"
         );
-        if self.sp < cfg::TOTAL_STACK_SIZE {
-            self.stack[self.sp as usize] = item;
-        }
+        self.stack[self.sp as usize] = item;
+
         self.sp += 1;
     }
     ///Pops from stack

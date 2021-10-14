@@ -136,7 +136,6 @@ impl Window {
 
     pub fn play(&mut self, st: u32) {
         self.device.as_mut().unwrap().resume();
-        //std::thread::sleep(Duration::from_millis(1));
         if st <= 1 {
             self.device.as_mut().unwrap().pause();
         }
