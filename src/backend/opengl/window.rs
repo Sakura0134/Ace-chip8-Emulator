@@ -13,100 +13,155 @@
 //! }
 //! ```
 
-use glfw::{Action, Context, Key};
-use std::ops::Drop;
-use std::sync::mpsc::Receiver;
+use sdl2::audio::{AudioCallback, AudioSpecDesired};
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode as KeyCode;
+use std::convert::TryInto;
+use std::os::raw::c_void;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
+
+struct SquareWave {
+    phase_inc: f32,
+    phase: f32,
+    volume: f32,
+}
+
+impl AudioCallback for SquareWave {
+    type Channel = f32;
+
+    fn callback(&mut self, out: &mut [f32]) {
+        // Generate a square wave
+        for x in out.iter_mut() {
+            *x = if self.phase <= 0.5 {
+                self.volume
+            } else {
+                -self.volume
+            };
+            self.phase = (self.phase + self.phase_inc) % 1.0;
+        }
+    }
+}
 
 ///Window Struct
 pub struct Window {
-    glfw: glfw::Glfw,
-    window: Option<glfw::Window>,
-    events: Option<Receiver<(f64, glfw::WindowEvent)>>,
+    pub sdl: sdl2::Sdl,
+    window: Option<sdl2::video::Window>,
+    _gl_context: Option<sdl2::video::GLContext>,
+    event_pump: Option<sdl2::EventPump>,
     width: u32,
     height: u32,
     title: &'static str,
+    device: Option<sdl2::audio::AudioDevice<SquareWave>>,
 }
+
 ///Window Module
 impl Window {
-    ///Creates a Window struct with width, height & title
     pub fn new(width: u32, height: u32, title: &'static str) -> Self {
         Window {
-            glfw: glfw::init(glfw::FAIL_ON_ERRORS)
-                .expect("[Error] Initialising GLFW.\nAborting..."),
+            sdl: sdl2::init().expect("[Error] Initialising SDL.\nAborting..."),
             window: None,
-            events: None,
+            _gl_context: None,
+            event_pump: None,
             width,
             height,
             title,
+            device: None,
         }
     }
 
     ///It creates window and events\
     ///Also, enables key polling and creates an opengl context  
     pub fn init(&mut self) {
-        self.glfw
-            .window_hint(glfw::WindowHint::ContextVersion(3, 3));
-        self.glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-            glfw::OpenGlProfileHint::Core,
-        ));
-        self.glfw
-            .window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+        let video_subsystem = self.sdl.video().unwrap();
+        let gl_attr = video_subsystem.gl_attr();
 
-        let (mut window, events) = self
-            .glfw
-            .create_window(
-                self.width,
-                self.height,
-                self.title,
-                glfw::WindowMode::Windowed,
-            )
-            .expect("[Error] Creating Window\nAborting...");
+        gl_attr.set_context_version(3, 3);
+        gl_attr.set_context_profile(sdl2::video::GLProfile::Core);
+        gl_attr.set_context_flags().forward_compatible();
 
-        window.make_current();
-        self.glfw.set_swap_interval(glfw::SwapInterval::Sync(0));
-        //window.set_key_polling(true);
-        //window.set_framebuffer_size_polling(true);
-        window.set_all_polling(true);
-        window.set_resizable(false);
+        let window = video_subsystem
+            .window(self.title, self.width, self.height)
+            .opengl()
+            .position_centered()
+            .build()
+            .unwrap();
 
-        gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
-        let (buffersize_width, buffersize_height) = window.get_framebuffer_size();
+        let gl_context = window.gl_create_context().unwrap();
+        video_subsystem.gl_set_swap_interval(0).unwrap();
+        gl::load_with(|symbol| video_subsystem.gl_get_proc_address(symbol) as *const _);
+
+        let (buffersize_width, buffersize_height) = window.drawable_size();
         unsafe {
-            gl::Viewport(0, 0, buffersize_width, buffersize_height);
+            gl::Viewport(
+                0,
+                0,
+                buffersize_width.try_into().unwrap(),
+                buffersize_height.try_into().unwrap(),
+            );
         }
 
+        let event_pump = self.sdl.event_pump().unwrap();
+
         self.window = Some(window);
-        self.events = Some(events);
+        self._gl_context = Some(gl_context);
+        self.event_pump = Some(event_pump);
+
+        let audio_subsystem = self.sdl.audio().unwrap();
+        let desired_spec = AudioSpecDesired {
+            freq: Some(44100),
+            channels: Some(1),
+            samples: None,
+        };
+
+        let device = audio_subsystem
+            .open_playback(None, &desired_spec, |spec| SquareWave {
+                phase_inc: 440.0 / spec.freq as f32,
+                phase: 0.0,
+                volume: 0.25,
+            })
+            .unwrap();
+        self.device = Some(device);
     }
 
-    ///Checks if window should close
-    pub fn should_close(&self) -> bool {
-        self.window.as_ref().unwrap().should_close()
+    ///Get frame time
+    pub fn get_ticks(&self) -> u32 {
+        self.sdl.timer().unwrap().ticks()
     }
 
-    ///Poll Events
-    pub fn poll_events(&mut self) {
-        self.glfw.poll_events();
+    ///Swap Window
+    pub fn swap_window(&mut self) {
+        self.window.as_mut().unwrap().gl_swap_window();
     }
 
-    ///Swap Buffers
-    pub fn swap_buffers(&mut self) {
-        self.window.as_mut().unwrap().swap_buffers();
+    pub fn play(&mut self, st: u32) {
+        self.device.as_mut().unwrap().resume();
+        //std::thread::sleep(Duration::from_millis(1));
+        if st <= 1 {
+            self.device.as_mut().unwrap().pause();
+        }
     }
 
-    ///Handles Input events
-    pub fn process_events(&mut self, key_map: &[Key], keyboard: &mut crate::Keyboard) {
-        for (_, event) in glfw::flush_messages(self.events.as_ref().unwrap()) {
+    ///Handles Input events and window state
+    pub fn process_events(&mut self, key_map: &[KeyCode], keyboard: &mut crate::Keyboard) -> bool {
+        for event in self.event_pump.as_mut().unwrap().poll_iter() {
             match event {
-                glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => {
-                    self.window.as_mut().unwrap().set_should_close(true)
-                }
-                glfw::WindowEvent::Key(key, _, Action::Press, _) => keyboard.on_press(key_map, key),
-                glfw::WindowEvent::Key(key, _, Action::Release, _) => {
-                    keyboard.on_release(key_map, key)
-                }
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(KeyCode::Escape),
+                    ..
+                } => return false,
+                Event::KeyDown {
+                    keycode: Some(keycode),
+                    ..
+                } => keyboard.on_press(key_map, keycode),
+                Event::KeyUp {
+                    keycode: Some(keycode),
+                    ..
+                } => keyboard.on_release(key_map, keycode),
                 _ => {}
             }
         }
+        true
     }
 }

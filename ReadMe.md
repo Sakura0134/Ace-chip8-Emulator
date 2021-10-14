@@ -29,6 +29,9 @@ delay = 100 //Sets delay
 [Screen]
 scale = 10 //Sets scaling
 
+[Audio]
+enable = true //Sets Audio
+
 [Shader] //To Specify Shader Location
 v_shader = config/shader/triangle.vert
 f_shader = config/shader/triangle.frag
@@ -40,7 +43,7 @@ f_shader = config/shader/triangle.frag
 ## Things to be Done
 - [x] Boot Games
 - [x] Add OpenGL Backend
-- [ ] Add Audio Support
+- [x] Add Audio Support
 - [x] Add Keyboard Support
 - [x] Emulate VM
 - [ ] Add Vulkan Backend
@@ -51,3 +54,5 @@ f_shader = config/shader/triangle.frag
 ## Imperfections in Code
 - [ ] Need to find a better way to handle inputs
 - [ ] Optimize opengl code
+- [ ] Audio slows down the code
+- [ ] Find the bad instruction(causing troubles in INVADERS)

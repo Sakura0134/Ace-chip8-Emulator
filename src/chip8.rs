@@ -42,7 +42,6 @@ use display::Display;
 use keyboard::Keyboard;
 use memory::Memory;
 
-use glfw::Key;
 use opengl::{mesh::Mesh, shader::Shader, window::Window};
 
 ///#Ace emulator config
@@ -53,6 +52,7 @@ pub struct Config {
     bg: &'static cfg::Color,
     pub fg: &'static cfg::Color,
     delay: u16,
+    audio: bool,
 }
 
 ///# Chip8 Struct
@@ -218,7 +218,7 @@ impl Chip8 {
             }
             //LD ST, Vx
             0x18 => {
-                self.cpu.st = self.cpu.v[x as usize];
+                self.cpu.st = self.cpu.v[x as usize] * 10;
             }
             //ADD I, Vx
             0x1E => {
@@ -340,6 +340,8 @@ fn load_config(config_loc: &str) -> Config {
 
             ini.with_section(Some("Screen")).set("scale", "10");
 
+            ini.with_section(Some("Audio")).set("enable", "false");
+
             ini.with_section(Some("Shader"))
                 .set("v_shader", "config/shader/triangle.vert")
                 .set("f_shader", "config/shader/triangle.frag");
@@ -383,6 +385,13 @@ fn load_config(config_loc: &str) -> Config {
 
     let delay: u16 = delay.trim().parse().unwrap();
 
+    let audio = match config_ini.section(Some("Audio")) {
+        Some(val) => val.get("enable").unwrap_or("false"),
+        None => "false",
+    };
+
+    let audio = audio.trim().parse().unwrap();
+
     Config {
         v_shader: v_shader.to_owned(),
         f_shader: f_shader.to_owned(),
@@ -390,6 +399,7 @@ fn load_config(config_loc: &str) -> Config {
         bg,
         fg,
         delay,
+        audio,
     }
 }
 
@@ -413,9 +423,7 @@ pub fn load(rom_loc: &str, config_loc: &str) {
 
     chip8.load_rom(rom_loc);
 
-    while !main_window.should_close() {
-        main_window.poll_events();
-
+    while main_window.process_events(&cfg::KEY_MAP, &mut chip8.keyboard) {
         unsafe {
             gl::ClearColor(config.bg.0, config.bg.1, config.bg.2, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
@@ -444,14 +452,17 @@ pub fn load(rom_loc: &str, config_loc: &str) {
 
             mesh_list.clear();
         }
-        main_window.process_events(&cfg::KEY_MAP, &mut chip8.keyboard);
-        main_window.swap_buffers();
+
+        main_window.swap_window();
 
         let opcode = chip8.memory.get_opcode(chip8.cpu.pc);
         chip8.cpu.pc += 2;
         chip8.exec(opcode);
 
         if chip8.cpu.st != 0 {
+            if config.audio {
+                main_window.play(chip8.cpu.st as u32);
+            }
             chip8.cpu.st -= 1;
         }
 

@@ -6,6 +6,7 @@
 //!
 //!```
 use super::cfg;
+use sdl2::keyboard::Keycode as Key;
 
 pub struct Keyboard {
     keypad: [bool; cfg::KEYPAD as usize],
@@ -20,7 +21,7 @@ impl Keyboard {
     }
 
     ///Executes on Press
-    pub fn on_press(&mut self, keymap: &[glfw::Key], key: glfw::Key) {
+    pub fn on_press(&mut self, keymap: &[Key], key: Key) {
         let key = self.mapped(keymap, key);
         if key != 999 {
             self.keypad[key] = true;
@@ -28,7 +29,7 @@ impl Keyboard {
     }
 
     ///Executes on Release
-    pub fn on_release(&mut self, keymap: &[glfw::Key], key: glfw::Key) {
+    pub fn on_release(&mut self, keymap: &[Key], key: Key) {
         let key = self.mapped(keymap, key);
         if key != 999 {
             self.keypad[key] = false;
@@ -51,7 +52,7 @@ impl Keyboard {
     }
 
     #[doc(hidden)]
-    fn mapped(&self, keymap: &[glfw::Key], key: glfw::Key) -> usize {
+    fn mapped(&self, keymap: &[Key], key: Key) -> usize {
         for (i, k) in keymap.iter().enumerate() {
             if key == *k {
                 return i;

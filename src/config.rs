@@ -1,5 +1,5 @@
 #![doc(hidden)]
-use glfw::Key;
+use sdl2::keyboard::Keycode as Key;
 
 //Window
 pub const WIDTH: u32 = 64;

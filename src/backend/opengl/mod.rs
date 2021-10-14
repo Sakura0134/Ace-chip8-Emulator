@@ -4,6 +4,5 @@ pub mod mesh;
 pub mod shader;
 ///Calls Window with opengl backend
 pub mod window;
-
 use gl::types;
 use std::ptr;
