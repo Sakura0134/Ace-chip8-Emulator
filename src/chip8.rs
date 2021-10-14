@@ -395,7 +395,7 @@ fn load_config(config_loc: &str) -> Config {
 
     let audio: bool = audio.trim().parse().unwrap();
 
-    let cpu = match config_ini.section(Some("Audio")) {
+    let cpu = match config_ini.section(Some("Hack")) {
         Some(val) => val.get("cpu").unwrap_or("700"),
         None => "700",
     };
