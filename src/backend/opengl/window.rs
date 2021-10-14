@@ -21,12 +21,14 @@ use std::os::raw::c_void;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+#[doc(hidden)]
 struct SquareWave {
     phase_inc: f32,
     phase: f32,
     volume: f32,
 }
 
+#[doc(hidden)]
 impl AudioCallback for SquareWave {
     type Channel = f32;
 
@@ -134,6 +136,7 @@ impl Window {
         self.window.as_mut().unwrap().gl_swap_window();
     }
 
+    ///Play Audio
     pub fn play(&mut self, st: u32) {
         self.device.as_mut().unwrap().resume();
         if st <= 1 {
