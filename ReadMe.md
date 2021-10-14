@@ -53,5 +53,5 @@ f_shader = config/shader/triangle.frag
 - [ ] Add a intermediate GUI library
 
 ## Imperfections in Code
-- [ ] Find the bad instruction(causing troubles in INVADERS)
-- [ ] Hint the bug that causes stack overflow in Invaders
+- [ ] Find the bad or missing instruction(causing troubles in INVADERS)
+- [ ] Hunt the bug that causes stack overflow in Invaders
