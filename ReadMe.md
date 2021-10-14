@@ -17,7 +17,7 @@ This is a chip8 emulator created using Rust programming Language. It's purpose i
 You can also change the config file location and execute it using `./ace-cli [GAME LOC] [CONFIG LOC]`
 
 ## Config.ini
-It handles basic settings in code
+It handles basic settings in code. It handles basic settings in code. Run the emulator once to create it.(In config folder in project repo)
 ```
 [Theme]
 bg = 3 //Sets background Colour
