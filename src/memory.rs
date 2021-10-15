@@ -14,9 +14,7 @@ impl Memory {
     ///Initializes Memory
     pub fn new() -> Self {
         let mut memory = [0u8; cfg::MEMORY as usize];
-        for (i, item) in cfg::DEFAULT_CHAR_SET.iter().enumerate() {
-            memory[i] = *item;
-        }
+        memory.copy_from_slice(&cfg::DEFAULT_CHAR_SET);
         Memory { memory }
     }
 
