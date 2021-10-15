@@ -14,7 +14,7 @@ impl Memory {
     ///Initializes Memory
     pub fn new() -> Self {
         let mut memory = [0u8; cfg::MEMORY as usize];
-        memory.copy_from_slice(&cfg::DEFAULT_CHAR_SET);
+        memory[0..80].copy_from_slice(&cfg::DEFAULT_CHAR_SET);
         Memory { memory }
     }
 
