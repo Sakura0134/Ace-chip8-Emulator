@@ -484,7 +484,7 @@ pub fn load(rom_loc: &str, config_loc: &str) {
         }
 
         while count + 1_f32 / config.cpu as f32 > main_window.get_ticks() as f32 / 1000_f32 {}
-        count += 1_f32 / config.cpu as f32;
+        count = main_window.get_ticks() as f32 / 1000_f32;
     }
 }
 
